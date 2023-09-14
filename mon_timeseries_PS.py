@@ -10,27 +10,32 @@ from enz_dyn import *
 
 fig = figure(figsize=(7.5, 1.5))
 
+## Parameters
+################################################################################
+t_end = 250   # time period in (h)
+dt = 0.005    # time step
+e  = 3.       # initial enzyme concnetration (nmol C/mm^3)
+totmon_range = [100., 200, 300]   # initial concnetration of NAG (monomer units)
+N = 200                           # size of chains in which the monomers above are trapped
+time = arange(0, t_end, dt)       # timeline of the simulation
+################################################################################
 
-t_end = 250
-dt = 0.005
-e  = 3.
-fr_exo = 0.
-totmon_range = [100., 200, 300]
-N = 200
-time = arange(0, t_end, dt)
-
-#color
+## Used for plots
+# color used for the plots (orange for exo-enzymes, blue for endo-enzymes)
 c = [(1,0.3961, 0.1529), 
      (0.2118, 0.2157, 0.6078)]
-
 simb = ["--", "-.", "-"]
+################################################################################
+
 T_endo = []
 aux = 0
 subplot(133)
+fr_exo = 0.   # fraction of exo-enzymes
 for totmon in totmon_range:
     print(float(totmon/N))
-    enz = Enzymes(int(N), totmon/N, 0.82, 0.82, 1., 1.)
-    mon = enz.evolve(t_end, dt, fr_exo, e)       
+    # starts the settings input: (chain_size, polymer concentration, kcat-exo,kcat-endo,km-exo, km-endo)
+    enz = Enzymes(int(N), totmon/N, 0.82, 0.82, 0.5, 0.5)
+    mon = enz.evolve(t_end, dt, fr_exo, e)   # degradation dynamics
     plot(time/24, mon, simb[aux], label = r"$N_n(t_0) = %.1f$" %(totmon/N), color = c[1])
     if(aux == 2):
         T_endo = mon
@@ -40,18 +45,16 @@ title("Endo-enzymes", weight = "bold", fontsize = 10)
 legend(loc = "best", fontsize = 6, frameon=False)
 gca().set_xlabel(r"time (days)")
 gca().set_yticks([])
-#gca().set_ylabel("monomers")
-
 
 text(-1.,  350, "C", fontsize=12, weight = "bold")
 
-fr_exo = 1.
+fr_exo = 1. # fraction of exo-enzymes
 T_exo = []
 aux = 0
 subplot(132)
 for totmon in totmon_range:
     print(float(totmon/N))
-    enz = Enzymes(int(N), totmon/N, 0.82, 0.82, 1., 1.)
+    enz = Enzymes(int(N), totmon/N, 0.82, 0.82, 0.5, 0.5)
     mon = enz.evolve(t_end, dt, fr_exo, e)       # see the paramters above
     plot(time/24, mon, simb[aux], label = r"$N_n(t_0) = %.1f$" %(totmon/N), color = c[0])
     if(aux == 2):
@@ -63,7 +66,7 @@ title("Exo-enzymes", weight = "bold", fontsize = 10)
 legend(loc = "best", fontsize = 6, frameon=False)
 gca().set_xlabel(r"time (days)")
 gca().set_yticks([])
-#gca().set_ylabel("monomers")
+
 
 text(-1.,  350, "B", fontsize=12, weight = "bold")
 
